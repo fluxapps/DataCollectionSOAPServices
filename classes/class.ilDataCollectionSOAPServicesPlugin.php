@@ -25,16 +25,7 @@ class ilDataCollectionSOAPServicesPlugin extends ilSoapHookPlugin
     public function getSoapMethods()
     {
         return array(
-            new \srag\Plugins\DataCollectionSOAPServices\PositionIds(),
-            new \srag\Plugins\DataCollectionSOAPServices\PositionTitle(),
-            new \srag\Plugins\DataCollectionSOAPServices\SuperiorPositionId(),
-            new \srag\Plugins\DataCollectionSOAPServices\EmployeePositionId(),
-            new \srag\Plugins\DataCollectionSOAPServices\UserIdsOfPosition(),
-            new \srag\Plugins\DataCollectionSOAPServices\UserIdsOfPositionAndOrgUnit(),
-            new \srag\Plugins\DataCollectionSOAPServices\AddUserIdToPositionInOrgUnit(),
-            new \srag\Plugins\DataCollectionSOAPServices\RemoveUserIdFromPositionInOrgUnit(),
-            new \srag\Plugins\DataCollectionSOAPServices\OrgUnitTree(),
-            new \srag\Plugins\DataCollectionSOAPServices\ImportOrgUnitTree(),
+            new \srag\Plugins\DataCollectionSOAPServices\TablesOfDataCollection()
         );
     }
 
