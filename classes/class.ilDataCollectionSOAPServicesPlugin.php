@@ -25,7 +25,10 @@ class ilDataCollectionSOAPServicesPlugin extends ilSoapHookPlugin
     public function getSoapMethods()
     {
         return array(
-            new \srag\Plugins\DataCollectionSOAPServices\TablesOfDataCollection()
+            new \srag\Plugins\DataCollectionSOAPServices\TablesOfDataCollection(),
+            new \srag\Plugins\DataCollectionSOAPServices\ViewsOfDataCollectionTable(),
+            new \srag\Plugins\DataCollectionSOAPServices\RecordsOfDataCollectionView(),
+            new \srag\Plugins\DataCollectionSOAPServices\ExportOfDataCollection()
         );
     }
 

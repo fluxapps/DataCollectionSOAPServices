@@ -2,14 +2,24 @@
 
 namespace srag\Plugins\DataCollectionSOAPServices;
 
-class RecordsOfDataCollectionView
+use ilDclCache;
+use ilDclTableView;
+
+class RecordsOfDataCollectionView extends Base
 {
+
+    protected $filter = [];
+
     /**
      * @return array
      */
     protected function getAdditionalInputParams()
     {
-        return array("obj_id" => Base::TYPE_INT);
+        return array(
+            "obj_id" => Base::TYPE_INT,
+            "dcl_table_id" => Base::TYPE_INT,
+            "dcl_view_id" => Base::TYPE_INT
+        );
     }
 
 
@@ -20,19 +30,34 @@ class RecordsOfDataCollectionView
      */
     protected function run(array $params)
     {
+        // Load records
         global $DIC;
         $ilDB = $DIC['ilDB'];
 
-        $result = $ilDB->queryF('SELECT * FROM il_dcl_table WHERE obj_id = %s',
-            array("integer"),
-            array($params[self::REF_ID]));
+        $tableview = ilDclTableView::find($params["dcl_view_id"]);
 
-        $end_result = [];
-        while ($row = $result->fetchAssoc()) {
-            array_push($end_result, ["id" => $row["id"], "title" => $row["title"]]);
+        $records = array();
+        $query = "SELECT id FROM il_dcl_record WHERE table_id = " . $ilDB->quote($params["dcl_table_id"], "integer");
+        $set = $ilDB->query($query);
+
+        while ($rec = $ilDB->fetchAssoc($set)) {
+            $records[$rec['id']] = ilDclCache::getRecordCache($rec['id']);
         }
 
-        return json_encode($end_result);
+        $data = array();
+
+        foreach ($records as $record) {
+            $record_data = array();
+
+            foreach ($tableview->getVisibleFields() as $field) {
+                $title = $field->getTitle();
+                $record_data[$title] = $record->getRecordFieldExportValue($field->getId());
+            }
+
+            $data[] = $record_data;
+        }
+
+        return json_encode($data);
     }
 
 
@@ -44,7 +69,7 @@ class RecordsOfDataCollectionView
      */
     public function getName()
     {
-        return "getTablesOfDataCollection";
+        return "getRecordsOfDataCollectionView";
     }
 
 
