@@ -17,7 +17,6 @@ class RecordsOfDataCollectionView extends Base
     {
         return array(
             "obj_id" => Base::TYPE_INT,
-            "dcl_table_id" => Base::TYPE_INT,
             "dcl_view_id" => Base::TYPE_INT
         );
     }
@@ -37,7 +36,9 @@ class RecordsOfDataCollectionView extends Base
         $tableview = ilDclTableView::find($params["dcl_view_id"]);
 
         $records = array();
-        $query = "SELECT id FROM il_dcl_record WHERE table_id = " . $ilDB->quote($params["dcl_table_id"], "integer");
+        $query = "SELECT id FROM il_dcl_record WHERE table_id = (SELECT table_id FROM il_dcl_tableview WHERE id = "
+            . $ilDB->quote($params["dcl_view_id"], "integer")
+            . ")";
         $set = $ilDB->query($query);
 
         while ($rec = $ilDB->fetchAssoc($set)) {
