@@ -16,7 +16,6 @@ class RecordsOfDataCollectionView extends Base
     protected function getAdditionalInputParams()
     {
         return array(
-            "obj_id" => Base::TYPE_INT,
             "dcl_view_id" => Base::TYPE_INT
         );
     }
@@ -27,7 +26,7 @@ class RecordsOfDataCollectionView extends Base
      */
     protected function run(array $params)
     {
-        // Load records
+        // Possible errors: View doesn't exist, obj_id doesn't exist
         global $DIC;
         $ilDB = $DIC['ilDB'];
 
@@ -83,6 +82,6 @@ class RecordsOfDataCollectionView extends Base
      */
     public function getDocumentation()
     {
-        return "Returns the data collection records of a specific view";
+        return "Returns the data collection records of a specific applied view";
     }
 }

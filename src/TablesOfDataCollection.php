@@ -2,6 +2,8 @@
 
 namespace srag\Plugins\DataCollectionSOAPServices;
 
+use ilObject;
+
 /**
  * Class TablesOfDataCollection
  *
@@ -17,7 +19,7 @@ class TablesOfDataCollection extends Base
      */
     protected function getAdditionalInputParams()
     {
-        return array("obj_id" => Base::TYPE_INT);
+        return array("ref_id" => Base::TYPE_INT);
     }
 
 
@@ -26,12 +28,16 @@ class TablesOfDataCollection extends Base
      */
     protected function run(array $params)
     {
+        // Possible errors: obj_id doesn't exist
         global $DIC;
         $ilDB = $DIC['ilDB'];
 
+        $ref_id = $params["ref_id"];
+        $obj_id = ilObject::_lookupObjectId($ref_id);
+
         $result = $ilDB->queryF('SELECT * FROM il_dcl_table WHERE obj_id = %s',
             array("integer"),
-            array($params["obj_id"]));
+            array($obj_id));
 
         $end_result = [];
         while ($row = $result->fetchAssoc()) {

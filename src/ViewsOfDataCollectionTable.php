@@ -25,6 +25,7 @@ class ViewsOfDataCollectionTable extends Base
      */
     protected function run(array $params)
     {
+        // Possible errors: View doesn't exist
         global $DIC;
         $ilDB = $DIC['ilDB'];
 

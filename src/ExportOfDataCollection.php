@@ -3,6 +3,7 @@
 namespace srag\Plugins\DataCollectionSOAPServices;
 
 use ilExport;
+use ilObject;
 
 class ExportOfDataCollection extends Base
 {
@@ -13,7 +14,7 @@ class ExportOfDataCollection extends Base
     protected function getAdditionalInputParams()
     {
         return array(
-            "obj_id" => Base::TYPE_INT,
+            "ref_id" => Base::TYPE_INT,
         );
     }
 
@@ -23,11 +24,13 @@ class ExportOfDataCollection extends Base
      */
     protected function run(array $params)
     {
+        // Possible errors: obj_id doesn't exist, various export errors
         $type = "dcl";
-        $id = $params["obj_id"];
+        $ref_id = $params["ref_id"];
+        $obj_id = ilObject::_lookupObjectId($ref_id);
 
         $exp = new ilExport();
-        $exp->exportObject($type, $id);
+        $exp->exportObject($type, $obj_id);
     }
 
 
