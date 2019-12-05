@@ -2,6 +2,7 @@
 
 namespace srag\Plugins\DataCollectionSOAPServices;
 
+use ilExport;
 use ilImportExportFactory;
 use srag\Plugins\DataCollectionSOAPServices\DuplicateClasses\ilExportCopy;
 
@@ -26,14 +27,11 @@ class ExportOfDataCollection extends Base
      */
     protected function run(array $params)
     {
-        $a_entity = "dcl";
-        $a_class = ilImportExportFactory::getExporterClass($a_entity);
-        $a_comp = ilImportExportFactory::getComponentForExport($a_entity);
-        $a_target_release = "";
-        $a_id = $params["obj_id"];
+        $type = "dcl";
+        $id = $params["obj_id"];
 
-        $exp = new ilExportCopy();
-        return $exp->processExporter($a_comp, $a_class, $a_entity, $a_target_release, $a_id);
+        $exp = new ilExport();
+        $exp->exportObject($type, $id);
     }
 
 
@@ -56,7 +54,7 @@ class ExportOfDataCollection extends Base
      */
     public function getOutputParams()
     {
-        return array('json' => Base::TYPE_STRING);
+        return [];
     }
 
 
