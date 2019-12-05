@@ -3,14 +3,12 @@
 namespace srag\Plugins\DataCollectionSOAPServices;
 
 use ilExport;
-use ilImportExportFactory;
-use srag\Plugins\DataCollectionSOAPServices\DuplicateClasses\ilExportCopy;
 
 class ExportOfDataCollection extends Base
 {
 
     /**
-     * @return array
+     * @inheritDoc
      */
     protected function getAdditionalInputParams()
     {
@@ -21,9 +19,7 @@ class ExportOfDataCollection extends Base
 
 
     /**
-     * @param array $params
-     *
-     * @return mixed
+     * @inheritDoc
      */
     protected function run(array $params)
     {
@@ -36,10 +32,7 @@ class ExportOfDataCollection extends Base
 
 
     /**
-     * Get the name of the method. Used as endpoint for SOAP requests.
-     * Note that this name must be unique in combination with the service namespace.
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getName()
     {
@@ -48,9 +41,7 @@ class ExportOfDataCollection extends Base
 
 
     /**
-     * Get the output parameters in the same format as the input parameters
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getOutputParams()
     {
@@ -59,12 +50,10 @@ class ExportOfDataCollection extends Base
 
 
     /**
-     * Get the documentation of this method
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getDocumentation()
     {
-        return "TODO";
+        return "Creates a downloadable export file of a specific data collection";
     }
 }
