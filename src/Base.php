@@ -23,6 +23,7 @@ abstract class Base extends ilAbstractSoapMethod
     const TYPE_DOUBLE_ARRAY = 'tns:doubleArray';
     const SID = 'sid';
     const REF_ID = 'ref_id';
+    const OBJ_TYPE = "dcl";
 
 
     /**

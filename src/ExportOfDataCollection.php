@@ -33,18 +33,27 @@ class ExportOfDataCollection extends Base
     /**
      * @inheritDoc
      * @throws ilDclException
+     * @throws ilSoapPluginException
      */
     protected function run(array $params)
     {
         $requested_format = strtolower($params["export_format"]);
 
         if (!in_array($requested_format, self::AVAILABLE_EXPORT_FORMATS)) {
-            //throw new ilSoapPluginException("Could not Read the XML File");
+            throw new ilSoapPluginException(sprintf("Format '%s' not found", $requested_format));
         }
 
-        $type = "dcl";
         $ref_id = $params["ref_id"];
         $obj_id = ilObject::_lookupObjectId($ref_id);
+        $type = ilObject:: _lookupType($obj_id);
+
+        if (is_null($type)) {
+            throw new ilSoapPluginException(sprintf("Object with ref id '%s' not found", $ref_id));
+        }
+
+        if ($type !== self::OBJ_TYPE) {
+            throw new ilSoapPluginException(sprintf("Object with ref id '%s' has invalid type: '%s' found, '%s' required", $ref_id, $type, self::OBJ_TYPE));
+        }
 
         if ($requested_format === "xlsx") {
             $exporter = new ilDclContentExporter($ref_id);
@@ -53,10 +62,6 @@ class ExportOfDataCollection extends Base
             $exp = new ilExport();
             $exp->exportObject($type, $obj_id);
         }
-
-        // Possible errors: obj_id doesn't exist, various export errors
-
-
     }
 
 
