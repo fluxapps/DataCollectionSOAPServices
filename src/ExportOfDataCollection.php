@@ -11,6 +11,11 @@ use ilSoapPluginException;
 class ExportOfDataCollection extends Base
 {
 
+    const NAME = "getExportOfDataCollection";
+    const DESCRIPTION = "Creates a downloadable export file of a specific data collection";
+    const ERR_FORMAT_NOT_FOUND = "Format '%s' not found, only the following formats are allowed: [%s]";
+    const ERR_OBJ_NOT_FOUND = "Object with ref id '%s' not found";
+    const ERR_OBJ_INVALID_TYPE = "Object with ref id '%s' has invalid type: '%s' found, '%s' required";
     const AVAILABLE_EXPORT_FORMATS
         = [
             "xlsx",
@@ -24,7 +29,7 @@ class ExportOfDataCollection extends Base
     protected function getAdditionalInputParams()
     {
         return array(
-            "export_format" => Base::TYPE_STRING
+            "export_format" => Base::TYPE_STRING,
         );
     }
 
@@ -39,9 +44,11 @@ class ExportOfDataCollection extends Base
         $requested_format = strtolower($params["export_format"]);
 
         if (!in_array($requested_format, self::AVAILABLE_EXPORT_FORMATS)) {
-            throw new ilSoapPluginException(sprintf("Format '%s' not found, only the following formats are allowed: [%s]",
+            throw new ilSoapPluginException(sprintf(
+                self::ERR_FORMAT_NOT_FOUND,
                 $requested_format,
-                implode(", ", self::AVAILABLE_EXPORT_FORMATS)));
+                implode(", ", self::AVAILABLE_EXPORT_FORMATS)
+            ));
         }
 
         $ref_id = $params[self::REF_ID];
@@ -49,19 +56,21 @@ class ExportOfDataCollection extends Base
         $type = ilObject:: _lookupType($obj_id);
 
         if (is_null($type)) {
-            throw new ilSoapPluginException(sprintf("Object with ref id '%s' not found", $ref_id));
+            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_NOT_FOUND, $ref_id));
         }
 
         if ($type !== self::OBJ_TYPE) {
-            throw new ilSoapPluginException(sprintf("Object with ref id '%s' has invalid type: '%s' found, '%s' required", $ref_id, $type, self::OBJ_TYPE));
+            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_INVALID_TYPE, $ref_id, $type, self::OBJ_TYPE));
         }
 
         if ($requested_format === "xlsx") {
             $exporter = new ilDclContentExporter($ref_id);
             $exporter->exportAsync();
-        } else if ($requested_format === "xml") {
-            $exp = new ilExport();
-            $exp->exportObject($type, $obj_id);
+        } else {
+            if ($requested_format === "xml") {
+                $exp = new ilExport();
+                $exp->exportObject($type, $obj_id);
+            }
         }
     }
 
@@ -71,7 +80,7 @@ class ExportOfDataCollection extends Base
      */
     public function getName()
     {
-        return "getExportOfDataCollection";
+        return self::NAME;
     }
 
 
@@ -89,6 +98,6 @@ class ExportOfDataCollection extends Base
      */
     public function getDocumentation()
     {
-        return "Creates a downloadable export file of a specific data collection";
+        return self::DESCRIPTION;
     }
 }

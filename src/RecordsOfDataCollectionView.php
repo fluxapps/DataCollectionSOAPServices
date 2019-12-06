@@ -9,7 +9,10 @@ use ilSoapPluginException;
 class RecordsOfDataCollectionView extends Base
 {
 
-    protected $filter = [];
+    const NAME = "getRecordsOfDataCollectionView";
+    const DESCRIPTION = "Returns the data collection records of a specific applied view";
+    const ERR_VIEW_NOT_FOUND = "View with id '%s' not found";
+
 
     /**
      * @inheritDoc
@@ -17,7 +20,7 @@ class RecordsOfDataCollectionView extends Base
     protected function getAdditionalInputParams()
     {
         return array(
-            "dcl_view_id" => Base::TYPE_INT
+            "dcl_view_id" => Base::TYPE_INT,
         );
     }
 
@@ -34,12 +37,12 @@ class RecordsOfDataCollectionView extends Base
         $tableview = ilDclTableView::find($params["dcl_view_id"]);
 
         if (is_null($tableview)) {
-            throw new ilSoapPluginException(sprintf("View with id '%s' not found", $params["dcl_view_id"]));
+            throw new ilSoapPluginException(sprintf(self::ERR_VIEW_NOT_FOUND, $params["dcl_view_id"]));
         }
 
         $records = array();
 
-         $result = $ilDB->queryF('SELECT id FROM il_dcl_record WHERE table_id = (SELECT table_id FROM il_dcl_tableview WHERE id = %s)',
+        $result = $ilDB->queryF('SELECT id FROM il_dcl_record WHERE table_id = (SELECT table_id FROM il_dcl_tableview WHERE id = %s)',
             array("integer"),
             array($params["dcl_view_id"]));
 
@@ -69,7 +72,7 @@ class RecordsOfDataCollectionView extends Base
      */
     public function getName()
     {
-        return "getRecordsOfDataCollectionView";
+        return self::NAME;
     }
 
 
@@ -87,6 +90,6 @@ class RecordsOfDataCollectionView extends Base
      */
     public function getDocumentation()
     {
-        return "Returns the data collection records of a specific applied view";
+        return self::DESCRIPTION;
     }
 }

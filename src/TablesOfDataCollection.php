@@ -15,6 +15,12 @@ use ilSoapPluginException;
 class TablesOfDataCollection extends Base
 {
 
+    const NAME = "getTablesOfDataCollection";
+    const DESCRIPTION = "Returns all table IDs and their respective title";
+    const ERR_OBJ_NOT_FOUND = "Object with ref id '%s' not found";
+    const ERR_OBJ_INVALID_TYPE = "Object with ref id '%s' has invalid type: '%s' found, '%s' required";
+
+
     /**
      * @inheritDoc
      */
@@ -38,11 +44,15 @@ class TablesOfDataCollection extends Base
         $type = ilObject:: _lookupType($obj_id);
 
         if (is_null($type)) {
-            throw new ilSoapPluginException(sprintf("Object with ref id '%s' not found", $ref_id));
+            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_NOT_FOUND, $ref_id));
         }
 
         if ($type !== self::OBJ_TYPE) {
-            throw new ilSoapPluginException(sprintf("Object with ref id '%s' has invalid type: '%s' found, '%s' required", $ref_id, $type, self::OBJ_TYPE));
+            throw new ilSoapPluginException(sprintf(
+                    self::ERR_OBJ_INVALID_TYPE,
+                    $ref_id, $type,
+                    self::OBJ_TYPE)
+            );
         }
 
         $result = $ilDB->queryF('SELECT * FROM il_dcl_table WHERE obj_id = %s',
@@ -63,7 +73,7 @@ class TablesOfDataCollection extends Base
      */
     public function getName()
     {
-        return "getTablesOfDataCollection";
+        return self::NAME;
     }
 
 
@@ -81,6 +91,6 @@ class TablesOfDataCollection extends Base
      */
     public function getDocumentation()
     {
-        return "Returns all table IDs and their respective title";
+        return self::DESCRIPTION;
     }
 }

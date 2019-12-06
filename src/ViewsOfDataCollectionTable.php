@@ -2,7 +2,6 @@
 
 namespace srag\Plugins\DataCollectionSOAPServices;
 
-use ilDclTable;
 use ilSoapPluginException;
 
 /**
@@ -14,6 +13,11 @@ use ilSoapPluginException;
  */
 class ViewsOfDataCollectionTable extends Base
 {
+
+    const NAME = "getViewsOfDataCollectionTable";
+    const DESCRIPTION = "Returns all view IDs and their respective title";
+    const ERR_TABLE_NOT_FOUND = "Table with id '%s' not found";
+
 
     /**
      * @inheritDoc
@@ -40,7 +44,7 @@ class ViewsOfDataCollectionTable extends Base
         );
 
         if ($result->rowCount() === 0) {
-            throw new ilSoapPluginException(sprintf("Table with id '%s' not found", $params["dcl_table_id"]));
+            throw new ilSoapPluginException(sprintf(self::ERR_TABLE_NOT_FOUND, $params["dcl_table_id"]));
         }
 
         $result = $ilDB->queryF('SELECT * FROM il_dcl_tableview WHERE table_id = %s',
@@ -62,7 +66,7 @@ class ViewsOfDataCollectionTable extends Base
      */
     public function getName()
     {
-        return "getViewsOfDataCollectionTable";
+        return self::NAME;
     }
 
 
@@ -80,6 +84,6 @@ class ViewsOfDataCollectionTable extends Base
      */
     public function getDocumentation()
     {
-        return "Returns all view IDs and their respective title";
+        return self::DESCRIPTION;
     }
 }
