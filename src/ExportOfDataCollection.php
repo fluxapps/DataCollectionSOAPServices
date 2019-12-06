@@ -24,8 +24,7 @@ class ExportOfDataCollection extends Base
     protected function getAdditionalInputParams()
     {
         return array(
-            "ref_id"        => Base::TYPE_INT,
-            "export_format" => Base::TYPE_STRING,
+            "export_format" => Base::TYPE_STRING
         );
     }
 
@@ -40,10 +39,12 @@ class ExportOfDataCollection extends Base
         $requested_format = strtolower($params["export_format"]);
 
         if (!in_array($requested_format, self::AVAILABLE_EXPORT_FORMATS)) {
-            throw new ilSoapPluginException(sprintf("Format '%s' not found", $requested_format));
+            throw new ilSoapPluginException(sprintf("Format '%s' not found, only the following formats are allowed: [%s]",
+                $requested_format,
+                implode(", ", self::AVAILABLE_EXPORT_FORMATS)));
         }
 
-        $ref_id = $params["ref_id"];
+        $ref_id = $params[self::REF_ID];
         $obj_id = ilObject::_lookupObjectId($ref_id);
         $type = ilObject:: _lookupType($obj_id);
 

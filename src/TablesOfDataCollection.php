@@ -3,6 +3,7 @@
 namespace srag\Plugins\DataCollectionSOAPServices;
 
 use ilObject;
+use ilSoapPluginException;
 
 /**
  * Class TablesOfDataCollection
@@ -19,21 +20,30 @@ class TablesOfDataCollection extends Base
      */
     protected function getAdditionalInputParams()
     {
-        return array("ref_id" => Base::TYPE_INT);
+        return array();
     }
 
 
     /**
      * @inheritDoc
+     * @throws ilSoapPluginException
      */
     protected function run(array $params)
     {
-        // Possible errors: obj_id doesn't exist
         global $DIC;
         $ilDB = $DIC['ilDB'];
 
-        $ref_id = $params["ref_id"];
+        $ref_id = $params[self::REF_ID];
         $obj_id = ilObject::_lookupObjectId($ref_id);
+        $type = ilObject:: _lookupType($obj_id);
+
+        if (is_null($type)) {
+            throw new ilSoapPluginException(sprintf("Object with ref id '%s' not found", $ref_id));
+        }
+
+        if ($type !== self::OBJ_TYPE) {
+            throw new ilSoapPluginException(sprintf("Object with ref id '%s' has invalid type: '%s' found, '%s' required", $ref_id, $type, self::OBJ_TYPE));
+        }
 
         $result = $ilDB->queryF('SELECT * FROM il_dcl_table WHERE obj_id = %s',
             array("integer"),

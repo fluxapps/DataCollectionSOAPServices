@@ -4,6 +4,7 @@ namespace srag\Plugins\DataCollectionSOAPServices;
 
 use ilDclCache;
 use ilDclTableView;
+use ilSoapPluginException;
 
 class RecordsOfDataCollectionView extends Base
 {
@@ -23,22 +24,26 @@ class RecordsOfDataCollectionView extends Base
 
     /**
      * @inheritDoc
+     * @throws ilSoapPluginException
      */
     protected function run(array $params)
     {
-        // Possible errors: View doesn't exist, obj_id doesn't exist
         global $DIC;
         $ilDB = $DIC['ilDB'];
 
         $tableview = ilDclTableView::find($params["dcl_view_id"]);
 
-        $records = array();
-        $query = "SELECT id FROM il_dcl_record WHERE table_id = (SELECT table_id FROM il_dcl_tableview WHERE id = "
-            . $ilDB->quote($params["dcl_view_id"], "integer")
-            . ")";
-        $set = $ilDB->query($query);
+        if (is_null($tableview)) {
+            throw new ilSoapPluginException(sprintf("View with id '%s' not found", $params["dcl_view_id"]));
+        }
 
-        while ($rec = $ilDB->fetchAssoc($set)) {
+        $records = array();
+
+         $result = $ilDB->queryF('SELECT id FROM il_dcl_record WHERE table_id = (SELECT table_id FROM il_dcl_tableview WHERE id = %s)',
+            array("integer"),
+            array($params["dcl_view_id"]));
+
+        while ($rec = $result->fetchAssoc()) {
             $records[$rec['id']] = ilDclCache::getRecordCache($rec['id']);
         }
 

@@ -49,6 +49,7 @@ abstract class Base extends ilAbstractSoapMethod
         return array_merge(
             array(
                 self::SID => self::TYPE_STRING,
+                self::REF_ID => self::TYPE_INT
             ), $this->getAdditionalInputParams()
         );
     }
@@ -76,12 +77,12 @@ abstract class Base extends ilAbstractSoapMethod
 
         // Check Permissions
         global $DIC;
-        if (!$DIC->access()->checkAccess('write', '', (int) \ilObjOrgUnit::getRootOrgRefId())) {
+        if (!$DIC->access()->checkAccessOfUser($DIC->user()->getId(), 'write', '', $params[1])) {
             $this->error('Permission denied');
         }
 
         $clean_params = array();
-        $i = 1;
+        $i = 2;
         foreach ($this->getAdditionalInputParams() as $key => $type) {
             $clean_params[$key] = $params[$i];
             $i++;

@@ -2,6 +2,9 @@
 
 namespace srag\Plugins\DataCollectionSOAPServices;
 
+use ilDclTable;
+use ilSoapPluginException;
+
 /**
  * Class ViewsOfDataCollectionTable
  *
@@ -11,6 +14,7 @@ namespace srag\Plugins\DataCollectionSOAPServices;
  */
 class ViewsOfDataCollectionTable extends Base
 {
+
     /**
      * @inheritDoc
      */
@@ -22,16 +26,27 @@ class ViewsOfDataCollectionTable extends Base
 
     /**
      * @inheritDoc
+     * @throws ilSoapPluginException
      */
     protected function run(array $params)
     {
-        // Possible errors: View doesn't exist
         global $DIC;
         $ilDB = $DIC['ilDB'];
 
+        // Check if table exists
+        $result = $ilDB->queryF('SELECT * FROM il_dcl_table WHERE id = %s',
+            array("integer"),
+            array($params["dcl_table_id"])
+        );
+
+        if ($result->rowCount() === 0) {
+            throw new ilSoapPluginException(sprintf("Table with id '%s' not found", $params["dcl_table_id"]));
+        }
+
         $result = $ilDB->queryF('SELECT * FROM il_dcl_tableview WHERE table_id = %s',
             array("integer"),
-            array($params["dcl_table_id"]));
+            array($params["dcl_table_id"])
+        );
 
         $end_result = [];
         while ($row = $result->fetchAssoc()) {
