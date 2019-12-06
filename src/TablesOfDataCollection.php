@@ -32,7 +32,6 @@ class TablesOfDataCollection extends Base
 
     /**
      * @inheritDoc
-     * @throws ilSoapPluginException
      */
     protected function run(array $params)
     {
@@ -41,19 +40,6 @@ class TablesOfDataCollection extends Base
 
         $ref_id = $params[self::REF_ID];
         $obj_id = ilObject::_lookupObjectId($ref_id);
-        $type = ilObject:: _lookupType($obj_id);
-
-        if (is_null($type)) {
-            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_NOT_FOUND, $ref_id));
-        }
-
-        if ($type !== self::OBJ_TYPE) {
-            throw new ilSoapPluginException(sprintf(
-                    self::ERR_OBJ_INVALID_TYPE,
-                    $ref_id, $type,
-                    self::OBJ_TYPE)
-            );
-        }
 
         $result = $ilDB->queryF('SELECT * FROM il_dcl_table WHERE obj_id = %s',
             array("integer"),

@@ -4,6 +4,7 @@ namespace srag\Plugins\DataCollectionSOAPServices;
 
 use ilAbstractSoapMethod;
 use ilDataCollectionSOAPServicesPlugin;
+use ilObject;
 use ilSoapPluginException;
 
 /**
@@ -24,6 +25,13 @@ abstract class Base extends ilAbstractSoapMethod
     const SID = 'sid';
     const REF_ID = 'ref_id';
     const OBJ_TYPE = "dcl";
+    const ERR_OBJ_NOT_FOUND = "Object with ref id '%s' not found";
+    const ERR_OBJ_INVALID_TYPE = "Object with ref id '%s' has invalid type: '%s' found, '%s' required";
+    const INPUT_PARAMS
+        = [
+            self::SID    => self::TYPE_STRING,
+            self::REF_ID => self::TYPE_INT,
+        ];
 
 
     /**
@@ -47,10 +55,8 @@ abstract class Base extends ilAbstractSoapMethod
     final public function getInputParams()
     {
         return array_merge(
-            array(
-                self::SID => self::TYPE_STRING,
-                self::REF_ID => self::TYPE_INT
-            ), $this->getAdditionalInputParams()
+            self::INPUT_PARAMS,
+            $this->getAdditionalInputParams()
         );
     }
 
@@ -75,6 +81,19 @@ abstract class Base extends ilAbstractSoapMethod
         $session_id = (isset($params[0])) ? $params[0] : '';
         $this->init($session_id);
 
+        // Check target ref_id
+        $ref_id = $params[1];
+        $obj_id = ilObject::_lookupObjectId($ref_id);
+        $type = ilObject:: _lookupType($obj_id);
+
+        if (is_null($type)) {
+            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_NOT_FOUND, $ref_id));
+        }
+
+        if ($type !== self::OBJ_TYPE) {
+            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_INVALID_TYPE, $ref_id, $type, self::OBJ_TYPE));
+        }
+
         // Check Permissions
         global $DIC;
         if (!$DIC->access()->checkAccessOfUser($DIC->user()->getId(), 'write', '', $params[1])) {
@@ -82,7 +101,13 @@ abstract class Base extends ilAbstractSoapMethod
         }
 
         $clean_params = array();
-        $i = 2;
+        $i = 0;
+
+        foreach (self::INPUT_PARAMS as $key => $type) {
+            $clean_params[$key] = $params[$i];
+            $i++;
+        }
+
         foreach ($this->getAdditionalInputParams() as $key => $type) {
             $clean_params[$key] = $params[$i];
             $i++;

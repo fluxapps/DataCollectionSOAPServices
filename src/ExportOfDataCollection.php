@@ -11,11 +11,9 @@ use ilSoapPluginException;
 class ExportOfDataCollection extends Base
 {
 
-    const NAME = "getExportOfDataCollection";
+    const NAME = "createExportOfDataCollection";
     const DESCRIPTION = "Creates a downloadable export file of a specific data collection";
     const ERR_FORMAT_NOT_FOUND = "Format '%s' not found, only the following formats are allowed: [%s]";
-    const ERR_OBJ_NOT_FOUND = "Object with ref id '%s' not found";
-    const ERR_OBJ_INVALID_TYPE = "Object with ref id '%s' has invalid type: '%s' found, '%s' required";
     const AVAILABLE_EXPORT_FORMATS
         = [
             "xlsx",
@@ -54,14 +52,6 @@ class ExportOfDataCollection extends Base
         $ref_id = $params[self::REF_ID];
         $obj_id = ilObject::_lookupObjectId($ref_id);
         $type = ilObject:: _lookupType($obj_id);
-
-        if (is_null($type)) {
-            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_NOT_FOUND, $ref_id));
-        }
-
-        if ($type !== self::OBJ_TYPE) {
-            throw new ilSoapPluginException(sprintf(self::ERR_OBJ_INVALID_TYPE, $ref_id, $type, self::OBJ_TYPE));
-        }
 
         if ($requested_format === "xlsx") {
             $exporter = new ilDclContentExporter($ref_id);
