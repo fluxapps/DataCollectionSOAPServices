@@ -4,6 +4,7 @@ namespace srag\Plugins\DataCollectionSOAPServices;
 
 use ilDclCache;
 use ilDclTableView;
+use ilObject;
 use ilSoapPluginException;
 
 class RecordsOfDataCollectionView extends Base
@@ -12,6 +13,7 @@ class RecordsOfDataCollectionView extends Base
     const NAME = "getRecordsOfDataCollectionView";
     const DESCRIPTION = "Returns the data collection records of a specific applied view";
     const ERR_VIEW_NOT_FOUND = "View with id '%s' not found";
+    const ERR_VIEW_NOT_CONNECTED_TO_REF_ID = "Specified view id '%s' is not linked to ref id '%s'";
 
 
     /**
@@ -39,6 +41,8 @@ class RecordsOfDataCollectionView extends Base
         if (is_null($tableview)) {
             throw new ilSoapPluginException(sprintf(self::ERR_VIEW_NOT_FOUND, $params["dcl_view_id"]));
         }
+
+        $this->checkIsViewLinkedToRef($params, $ilDB);
 
         $records = array();
 
@@ -91,5 +95,29 @@ class RecordsOfDataCollectionView extends Base
     public function getDocumentation()
     {
         return self::DESCRIPTION;
+    }
+
+
+    /**
+     * @param array $params
+     * @param       $ilDB
+     *
+     * @throws ilSoapPluginException
+     */
+    protected function checkIsViewLinkedToRef(array $params, $ilDB)
+    {
+        $ref_id = $params[self::REF_ID];
+        $obj_id = ilObject::_lookupObjectId($ref_id);
+
+        // Check if specified ref_id/obj_id has a connection to the requested view
+        $result = $ilDB->queryF('SELECT obj_id FROM il_dcl_table WHERE id = (SELECT table_id FROM il_dcl_tableview WHERE id = %s)',
+            array("integer"),
+            array($params["dcl_view_id"]));
+
+        $obj_id_record = $result->fetchAssoc()["obj_id"];
+
+        if (is_null($obj_id_record) || $obj_id_record == false || $obj_id_record != $obj_id) {
+            throw new ilSoapPluginException(sprintf(self::ERR_VIEW_NOT_CONNECTED_TO_REF_ID, $params["dcl_view_id"], $ref_id));
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace srag\Plugins\DataCollectionSOAPServices;
 
+use ilObject;
 use ilSoapPluginException;
 
 /**
@@ -17,6 +18,7 @@ class ViewsOfDataCollectionTable extends Base
     const NAME = "getViewsOfDataCollectionTable";
     const DESCRIPTION = "Returns all view IDs and their respective title";
     const ERR_TABLE_NOT_FOUND = "Table with id '%s' not found";
+    const ERR_TABLE_NOT_CONNECTED_TO_REF_ID = "Specified table id '%s' is not linked to ref id '%s'";
 
 
     /**
@@ -37,6 +39,9 @@ class ViewsOfDataCollectionTable extends Base
         global $DIC;
         $ilDB = $DIC['ilDB'];
 
+        $ref_id = $params[self::REF_ID];
+        $obj_id = ilObject::_lookupObjectId($ref_id);
+
         // Check if table exists
         $result = $ilDB->queryF('SELECT * FROM il_dcl_table WHERE id = %s',
             array("integer"),
@@ -45,6 +50,10 @@ class ViewsOfDataCollectionTable extends Base
 
         if ($result->rowCount() === 0) {
             throw new ilSoapPluginException(sprintf(self::ERR_TABLE_NOT_FOUND, $params["dcl_table_id"]));
+        }
+
+        if ($result->fetchAssoc()["obj_id"] != $obj_id) {
+            throw new ilSoapPluginException(sprintf(self::ERR_TABLE_NOT_CONNECTED_TO_REF_ID, $params["dcl_table_id"], $ref_id));
         }
 
         $result = $ilDB->queryF('SELECT * FROM il_dcl_tableview WHERE table_id = %s',
