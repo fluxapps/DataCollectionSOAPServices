@@ -28,6 +28,7 @@ class ExportOfDataCollection extends Base
     {
         return array(
             "export_format" => Base::TYPE_STRING,
+            "extend_data_middleware_fqdn_class_name" => Base::TYPE_STRING
         );
     }
 
@@ -40,6 +41,7 @@ class ExportOfDataCollection extends Base
     protected function run(array $params)
     {
         $requested_format = strtolower($params["export_format"]);
+        $extend_data_middleware = strtolower($params["extend_data_middleware_fqdn_class_name"]);
 
         if (!in_array($requested_format, self::AVAILABLE_EXPORT_FORMATS)) {
             throw new ilSoapPluginException(sprintf(
