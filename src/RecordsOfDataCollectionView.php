@@ -7,6 +7,7 @@ use ilDclTableView;
 use ilObject;
 use ilSoapPluginException;
 
+
 class RecordsOfDataCollectionView extends Base
 {
 
@@ -21,9 +22,12 @@ class RecordsOfDataCollectionView extends Base
      */
     protected function getAdditionalInputParams()
     {
-        return array(
+        $arr=  array(
             "dcl_view_id" => Base::TYPE_INT,
+            "extend_records_middleware_fqdn_class_name" => Base::TYPE_STRING
         );
+
+        return $arr;
     }
 
 
@@ -62,6 +66,11 @@ class RecordsOfDataCollectionView extends Base
             foreach ($tableview->getVisibleFields() as $field) {
                 $title = $field->getTitle();
                 $record_data[$title] = $record->getRecordFieldExportValue($field->getId());
+            }
+
+            if(class_exists($params["extend_records_middleware_fqdn_class_name"])) {
+                $middleware = $params["extend_records_middleware_fqdn_class_name"];
+                $record_data = $middleware::new()->process($record_data,$record);
             }
 
             $data[] = $record_data;

@@ -2,7 +2,7 @@
 
 namespace srag\Plugins\DataCollectionSOAPServices;
 
-use ilDclContentExporter;
+
 use ilDclException;
 use ilExport;
 use ilObject;
