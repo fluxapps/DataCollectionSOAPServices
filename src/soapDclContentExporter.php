@@ -1,7 +1,7 @@
 <?php
-include_once "./Customizing/global/plugins/Services/Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php";
+require_once __DIR__ ."../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php";
 
-require_once "./Modules/DataCollection/classes/Content/class.ilDclContentExporter.php";
+require_once __DIR__ ."../../../../../../../../Modules/DataCollection/classes/Content/class.ilDclContentExporter.php";
 
 class soapDclContentExporter extends ilDclContentExporter {
 
